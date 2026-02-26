@@ -1,0 +1,10 @@
+[build]
+builder = "nixpacks"
+
+[build.nixpacks]
+providers = ["python"]
+
+[deploy]
+startCommand = "python bot.py"
+restartPolicyType = "on-failure"
+restartPolicyMaxRetries = 5
