@@ -1,0 +1,1 @@
+# Pyrogram plugin auto-discovery
