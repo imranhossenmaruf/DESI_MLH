@@ -1,12 +1,27 @@
 import os
 
-API_ID = int(os.environ.get("API_ID"))
-API_HASH = os.environ.get("API_HASH")
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-MONGO_URL = os.environ.get("MONGO_URL")
+def get_env(name, default=None, required=False):
+    value = os.environ.get(name, default)
+    if required and not value:
+        print(f"WARNING: {name} is missing!")
+    return value
 
+API_ID = int(get_env("API_ID", 0))
+API_HASH = get_env("API_HASH", "")
+BOT_TOKEN = get_env("BOT_TOKEN", "", required=True)
+MONGO_URL = get_env("MONGO_URL", "")
+
+# Admin IDs safe handling
 ADMIN_IDS = []
-if os.environ.get("ADMIN_IDS"):
-    ADMIN_IDS = list(map(int, os.environ.get("ADMIN_IDS").split(",")))
+admin_env = get_env("ADMIN_IDS", "")
+if admin_env:
+    try:
+        ADMIN_IDS = list(map(int, admin_env.split(",")))
+    except:
+        ADMIN_IDS = []
 
-LOG_GROUP_ID = int(os.environ.get("LOG_GROUP_ID", 0))
+# Log Group safe
+try:
+    LOG_GROUP_ID = int(get_env("LOG_GROUP_ID", 0))
+except:
+    LOG_GROUP_ID = 0
