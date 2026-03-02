@@ -115,7 +115,7 @@ async def send_random_video(client, message):
         pass
 
 # ৫. এডমিন মোড এবং ব্রডকাস্ট সিস্টেম
-@app.on_message(filters.command("admin") & filters.user(ADMIN_IDS))
+@app.on_message(filters.command("brodcast") & filters.user(ADMIN_IDS))
 async def admin_mode_on(client, message):
     if message.from_user.id not in ADMIN_MODE_USERS:
         ADMIN_MODE_USERS.append(message.from_user.id)
@@ -136,7 +136,7 @@ async def admin_mode_on(client, message):
     )
     await message.reply_text(admin_text)
 
-@app.on_message(filters.command("adminexit") & filters.user(ADMIN_IDS))
+@app.on_message(filters.command("broadcastoff") & filters.user(ADMIN_IDS))
 async def admin_mode_off(client, message):
     if message.from_user.id in ADMIN_MODE_USERS:
         ADMIN_MODE_USERS.remove(message.from_user.id)
