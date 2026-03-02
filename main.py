@@ -278,5 +278,6 @@ async def save_video(client, message):
     if not await video_collection.find_one({"file_id": file_id}):
         await video_collection.insert_one({"file_id": file_id, "caption": message.caption or "No Title", "used_by": []})
 
-print("Bot Started Successfully...")
-app.run()
+if __name__ == "__main__":
+    print("Bot Started Successfully...")
+    app.run()
