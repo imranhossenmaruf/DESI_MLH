@@ -42,7 +42,7 @@ def get_default_buttons():
         ]
     ])
 
-async function send_log(message):
+async def send_log(c, message):
     try:
         await app.send_message(LOG_GROUP_ID, message)
     except Exception as e:
