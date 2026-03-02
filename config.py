@@ -5,7 +5,7 @@ def get_env(name, default=None, required=False):
     if required and not value:
         print(f"WARNING: {name} is missing!")
     return value
-
+DATABASE_CHANNEL_ID = get_inv("DATABASE_CHANNEL_ID", "")
 API_ID = int(get_env("API_ID", 0))
 API_HASH = get_env("API_HASH", "")
 BOT_TOKEN = get_env("BOT_TOKEN", "", required=True)
