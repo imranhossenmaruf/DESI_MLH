@@ -15,13 +15,13 @@ import database as db
 # Load environment variables
 load_dotenv()
 
-API_ID = int(os.getenv("API_ID"))
-API_HASH = os.getenv("API_HASH")
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-LOG_GROUP_ID = int(os.getenv("LOG_GROUP_ID"))
-DATABASE_CHANNEL_ID = int(os.getenv("DATABASE_CHANNEL_ID"))
-ADMIN_ID = int(os.getenv("ADMIN_ID"))
-
+API_ID = int(os.getenv("API_ID", 0))
+API_HASH = os.getenv("API_HASH",0)
+BOT_TOKEN = (os.getenv("BOT_TOKEN",0))
+# bot.py এর লাইন ২০-২৪ এর পরিবর্তে এটি লিখুন
+LOG_GROUP_ID = int(os.getenv("LOG_GROUP_ID", 0))
+DATABASE_CHANNEL_ID = int(os.getenv("DATABASE_CHANNEL_ID", 0))
+ADMIN_ID = int(os.getenv("ADMIN_ID", 0))
 app = Client(
     "desi_mlh_bot",
     api_id=API_ID,
