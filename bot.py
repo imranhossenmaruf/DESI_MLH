@@ -121,7 +121,7 @@ async def callback_handler(client, query):
     user = await db.get_user(user_id)
 
     if user and datetime.now() - user['last_reset'] > timedelta(days=1):
-        await db.update_user(user_id, {"today_used": 0, "last_reset": datetime.now()})
+        client.send_video (user_id, {"today_used": 0, "last_reset": datetime.now()})
         user = await db.get_user(user_id)
 
     if query.data == "get_video":
