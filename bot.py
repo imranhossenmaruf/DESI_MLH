@@ -65,7 +65,7 @@ async def start_command(client, message):
     is_new_user = await db.add_user(user_id, first_name, username, referred_by)
     
     if is_new_user:
-        await send_log(f"👤 New User:\nName: {first_name}\nID: {user_id}\nUsername: @{username}")
+        await send_log(client,f"👤 New User:\nName: {first_name}\nID: {user_id}\nUsername: @{username}")
         if referred_by:
             inviter = await db.get_user(referred_by)
             if inviter:
