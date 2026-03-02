@@ -22,6 +22,7 @@ app = Client(
     api_id=API_ID,
     api_hash=API_HASH,
     bot_token=BOT_TOKEN
+    plugins=dict(root="plugins")
 )
 
 # ১. ইউজার ডাটা সেভ এবং রেফারেল ট্র্যাকিং
