@@ -1,5 +1,5 @@
-pyrogram==2.0.106
-tgcrypto==1.2.5
-motor==3.3.2
-pymongo==4.6.1
-dnspython==2.5.0
+pyrogram
+tgcrypto
+motor
+dnspython
+python-dotenv
