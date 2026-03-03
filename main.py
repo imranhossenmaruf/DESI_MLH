@@ -381,5 +381,5 @@ async def save_video(client, message):
 
 if __name__ == "__main__":
     print("Bot Started Successfully...")
-    from plugins.logs import 
+    from plugins.logs import *
     app.run()
