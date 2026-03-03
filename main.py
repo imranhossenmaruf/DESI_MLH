@@ -227,7 +227,6 @@ async def growth_report(client, message):
         "━━━━━━━━━━━━━━━━━━━"
     )
     await message.reply_text(report_text)
-
 # ৭. গ্রুপ মডারেশন সিস্টেম
 @app.on_message(filters.group & (filters.forwarded | filters.regex(r"(https?://[^\s]+)")))
 async def mod_handler(client, message):
@@ -237,6 +236,25 @@ async def mod_handler(client, message):
     except: pass
     
     await message.delete()
+
+    # ১. বাটন সেটআপ (তোর আগের কোডের ফরম্যাট অনুযায়ী)
+    bot = await client.get_me()
+    premium_msg = (
+        "Hello Admin 👋\n"
+        "I would like to upgrade to Premium Membership in this community.\n"
+        "Thank you 💖"
+    )
+    encoded_premium_msg = urllib.parse.quote(premium_msg)
+
+    buttons = InlineKeyboardMarkup([
+        [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{bot.username}?startgroup=true"),
+         InlineKeyboardButton("🔞 VIP** 🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
+        [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
+         InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_premium_msg}")],
+        [InlineKeyboardButton("📊 Referral Info", callback_data="ref_info")]
+    ])
+
+    # ২. ওয়ার্নিং টেক্সট
     warn_text = (
         "━━━━━━━━━━━━━━━━━━━\n"
         "🚫 **OFFICIAL WARNING NOTICE**\n"
@@ -249,10 +267,16 @@ async def mod_handler(client, message):
         "🤖 **DESI MLH Admin Panel**\n"
         "━━━━━━━━━━━━━━━━━━━"
     )
-    warn_msg = await message.reply_text(warn_text)
+
+    # ৩. বাটনসহ মেসেজ পাঠানো
+    warn_msg = await message.reply_text(warn_text, reply_markup=buttons)
+
+    # ৩০ সেকেন্ড পর ওয়ার্নিং মেসেজ ডিলিট করা
     await asyncio.sleep(30)
-    try: await warn_msg.delete()
-    except: pass
+    try: 
+        await warn_msg.delete()
+    except: 
+        pass
 
 @app.on_message(filters.command("mute") & filters.group)
 async def mute_cmd(client, message):
