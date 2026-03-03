@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from datetime import datetime
 
 # তোর লগ পাঠানোর গ্রুপের আইডি এখানে দে (অবশ্যই মাইনাস সহ)
-LOG_GROUP_ID = -100XXXXXXXXXX 
+LOG_GROUP_ID = -1002233445566 
 
 @Client.on_chat_join_request()
 async def join_log_handler(client, message):
