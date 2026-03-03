@@ -420,5 +420,4 @@ async def auto_approve_and_save_user(client, message):
         pass
 if __name__ == "__main__":
     print("Bot Started Successfully...")
-    from plugins.logs import *
     app.run()
