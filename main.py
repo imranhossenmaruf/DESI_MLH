@@ -446,7 +446,10 @@ async def auto_approve_and_save_user(client, message):
     try:
         await client.send_message(chat_id=LOG_GROUP_ID, text=f"🔔 **Approved & Saved:** {user.first_name}")
     except:
-        pass
-        if __name__ == "__main__":
+    # ৩. লগ পাঠানো শেষ
+    pass
+
+if __name__ == "__main__":
     print("Bot Started Successfully...")
     app.run()
+
