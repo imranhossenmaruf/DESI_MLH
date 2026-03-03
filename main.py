@@ -174,17 +174,13 @@ async def handle_bc_callback(client, callback_query):
         await callback_query.message.edit_text("⌨️ বাটন সেট করতে নিচের ফরম্যাটে রিপ্লাই দাও:\n\n`নাম | লিঙ্ক` \n\nযেমন: `Join | https://t.me/example` ")
     elif callback_query.data == "confirm_bc":
         await send_the_broadcast(client, callback_query.message, user_id)
-# বাটন ডিটেইলস রিসিভ করা (মূল মেসেজ পরিবর্তন না করে শুধু বাটন আপডেট হবে)
-@app.on_message(filters.private & filters.user(ADMIN_IDS) & filters.regex(r"\|"))
+# বাটন ডিটেইলস রিসিভ করা (মূল মেসেজ পরিবর্তন না করে শুধু বাটন আপডেট হবে)@app.on_message(filters.private & filters.user(ADMIN_IDS) & filters.regex(r"\|"))
 async def receive_btn_details(client, message):
     user_id = message.from_user.id
     if user_id in BROADCAST_DATA:
-        try:
-            parts = message.text.split("|")
-            # এখানে শুধু বাটন ডাটা আপডেট হবে, BROADCAST_DATA[user_id]["message"] আগেরটাই থাকবে
-            BROADCAST_DATA[user_id]["btn_name"] = parts[0].strip()
-            BROADCAST_DATA[user_id]["btn_url"] = parts[1].strip()
-            
+        parts = message.text.split("|")
+        BROADCAST_DATA[user_id]["btn_name"] = parts[0].strip()
+        BROADCAST_DATA[user_id]["btn_url"] = parts[1].strip()
             buttons = InlineKeyboardMarkup([[InlineKeyboardButton("🚀 START BROADCAST", callback_data="confirm_bc")]])
             await message.reply_text(
                 f"✅ **বাটন সেভ হয়েছে!**\n"
