@@ -100,13 +100,12 @@ async def handle_callback(client, callback_query: CallbackQuery):
             "━━━━━━━━━━━━━━━━━━━"
         )
         status_msg = await callback_query.message.reply_text(status_text, reply_markup=reply_markup)
-		await callback_query.answer()
-		await asyncio.sleep(30) # ৩০ সেকেন্ড ওয়েট
-		try:
-   		await status_msg.delete() # মেসেজ ডিলিট
-		except:
-   		pass
-
+        await callback_query.answer() # এখানে ৪টি স্পেস ডানে সরে আসবে
+        await asyncio.sleep(30)        # এখানেও ৪টি স্পেস ডানে সরে আসবে
+        try:
+            await status_msg.delete()  # এখানেও ৪টি স্পেস ডানে সরে আসবে
+        except:
+            pass
     # ২. Referral Info ক্লিক করলে তোর দেওয়া ফরমেটে মেসেজ আসবে
     elif callback_query.data == "ref_info":
         total_refers = user_data.get('refers', 0) if user_data else 0
