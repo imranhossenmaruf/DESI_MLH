@@ -115,64 +115,31 @@ async def send_random_video(client, message):
         await sent_msg.delete()
     except:
         pass
-# ৫. --- ব্রডকাস্ট উইজার্ড শুরু (১১২ নম্বর লাইন থেকে রিপ্লেস কর) ---
-@app.on_message(filters.private & filters.user(ADMIN_IDS) & ~filters.command(["start", "admin", "adminexit", "video", "profile", "overview", "overview7days"]))
-async def broadcast_wizard(client, message):
-    if message.from_user.id in ADMIN_MODE_USERS:
-        user_id = message.from_user.id
-        BROADCAST_DATA[user_id] = {"message": message, "btn_name": None, "btn_url": None}
-
-        buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔗 SET BUTTON URL", callback_data="set_btn_url")],
-            [InlineKeyboardButton("🚀 SEND NOW (No Button)", callback_data="confirm_broadcast")]
-        ])
-        await message.reply_text("📝 মেসেজ পাওয়া গেছে! বাটন এড করতে চাস?", reply_markup=buttons)
-
-# কনফার্মেশন ও বাটন সেট করার কলব্যাক (এটি নতুন যোগ করবি)
-@app.on_callback_query(filters.regex(r"^(set_btn_url|confirm_broadcast)$"))
-async def handle_bc_callback(client, callback_query):
-    user_id = callback_query.from_user.id
-    if callback_query.data == "set_btn_url":
-        await callback_query.message.edit_text("⌨️ বাটন সেট করতে এভাবে রিপ্লাই দাও: \n`নাম | লিঙ্ক` \nযেমন: `Join | https://t.me/example` ")
-    elif callback_query.data == "confirm_broadcast":
-        await send_the_broadcast(client, callback_query.message, user_id)
-
-# বাটন ডিটেইলস রিসিভ করা (এটিও নতুন যোগ করবি)
-@app.on_message(filters.private & filters.user(ADMIN_IDS) & filters.regex(r"\|"))
-async def receive_btn_details(client, message):
-    user_id = message.from_user.id
-    if user_id in BROADCAST_DATA:
-        try:
-            parts = message.text.split("|")
-            BROADCAST_DATA[user_id]["btn_name"], BROADCAST_DATA[user_id]["btn_url"] = parts[0].strip(), parts[1].strip()
-            buttons = InlineKeyboardMarkup([[InlineKeyboardButton("🚀 START BROADCAST", callback_data="confirm_broadcast")]])
-            await message.reply_text(f"✅ বাটন সেভ হয়েছে!\nনাম: {parts[0]}\nএখন শুরু করতে ক্লিক কর।", reply_markup=buttons)
-        except:
-            await message.reply_text("❌ ফরম্যাট ভুল! 'নাম | লিঙ্ক' এভাবে দাও।")
-
-# মেইন ব্রডকাস্ট ফাংশন (এটিও নতুন যোগ করবি)
-async def send_the_broadcast(client, status_msg, admin_id):
-    data = BROADCAST_DATA.get(admin_id)
-    all_users = await user_collection.find().to_list(length=None)
-    btn = InlineKeyboardMarkup([[InlineKeyboardButton(data["btn_name"], url=data["btn_url"])]]) if data["btn_name"] else None
-    await status_msg.edit_text("⏳ ব্রডকাস্টিং শুরু হয়েছে...")
-    count = 0
-    for user in all_users:
-        try:
-            await data["message"].copy(chat_id=user['user_id'], reply_markup=btn)
-            count += 1
-            await asyncio.sleep(0.05)
-        except: pass
-    await status_msg.edit_text(f"✅ ব্রডকাস্ট সম্পন্ন! {count} জন পেয়েছে।")
-    if admin_id in BROADCAST_DATA: del BROADCAST_DATA[admin_id]
-# --- ব্রডকাস্ট উইজার্ড শেষ ---
+# ৫. এডমিন মোড অন/অফ কমান্ড (তোর কাস্টম ফরম্যাট)
+@app.on_message(filters.command("broadcast") & filters.user(ADMIN_IDS))
+async def admin_mode_on(client, message):
+    if message.from_user.id not in ADMIN_MODE_USERS:
+        ADMIN_MODE_USERS.append(message.from_user.id)
+    await message.reply_text (
+        "━━━━━━━━━━━━━━━━━━━\n"
+        "🟢 **ADMIN MODE ACTIVATED**\n"
+        "━━━━━━━━━━━━━━━━━━━\n"
+        "👑 Admin Mode: **ON**\n"
+        "✅ You are now in Admin Mode\n"
+        "📌 **নির্দেশনাঃ**\n"
+        "🔹 সতর্কতার সাথে কমান্ড ব্যবহার করুন\n"
+        "🔹 স্প্যাম বা অপ্রয়োজনীয় কাজ এড়িয়ে চলুন\n"
+        "🔹 ইউজারদের সহায়তা করুন\n"
+        "🔹 লগ ও রিপোর্ট চেক করুন\n"
+        "🤖 **𝑫𝑬𝑺𝑰 𝑴𝑳𝑯**\n"
+        "━━━━━━━━━━━━━━━━━━━"
+    )
 
 @app.on_message(filters.command("broadcastoff") & filters.user(ADMIN_IDS))
 async def admin_mode_off(client, message):
     if message.from_user.id in ADMIN_MODE_USERS:
         ADMIN_MODE_USERS.remove(message.from_user.id)
-    
-    exit_text = (
+    await message.reply_text (
         "━━━━━━━━━━━━━━━━━━━\n"
         "🔴 **ADMIN MODE DEACTIVATED**\n"
         "━━━━━━━━━━━━━━━━━━━\n"
@@ -185,23 +152,63 @@ async def admin_mode_off(client, message):
         "🤖 **DESI MLH**\n"
         "━━━━━━━━━━━━━━━━━━━"
     )
-    await message.reply_text(exit_text)
 
-# ব্রডকাস্টিং (এডমিন মোড অন থাকলে যা লিখবেন তাই যাবে)
-@app.on_message(filters.private & filters.user(ADMIN_IDS) & ~filters.command(["start", "admin", "adminexit", "video", "profile", "overview", "overview7days"]))
-async def broadcast_handler(client, message):
+# ৬. ব্রডকাস্ট উইজার্ড
+@app.on_message(filters.private & filters.user(ADMIN_IDS) & ~filters.command(["start", "admin", "adminexit", "video", "profile", "overview", "overview7days", "broadcast", "broadcastoff"]))
+async def broadcast_wizard(client, message):
     if message.from_user.id in ADMIN_MODE_USERS:
-        all_users = await user_collection.find().to_list(length=None)
-        count = 0
-        for user in all_users:
-            try:
-                await message.copy(chat_id=user['user_id'])
-                count += 1
-                await asyncio.sleep(0.1)
-            except:
-                pass
-        await message.reply_text(f"📢 ব্রডকাস্ট সম্পন্ন! {count} জন ইউজারের কাছে পাঠানো হয়েছে।")
+        user_id = message.from_user.id
+        BROADCAST_DATA[user_id] = {"message": message, "btn_name": None, "btn_url": None}
 
+        buttons = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔗 SET BUTTON URL", callback_data="set_btn_url")],
+            [InlineKeyboardButton("🚀 SEND NOW (No Button)", callback_data="confirm_bc")]
+        ])
+        await message.reply_text("📝 মেসেজ পাওয়া গেছে! বাটন এড করতে চাস?", reply_markup=buttons)
+
+# বাটন সেট ও ব্রডকাস্ট কনফার্ম করার কলব্যাক
+@app.on_callback_query(filters.regex(r"^(set_btn_url|confirm_bc)$"))
+async def handle_bc_callback(client, callback_query):
+    user_id = callback_query.from_user.id
+    if callback_query.data == "set_btn_url":
+        await callback_query.message.edit_text("⌨️ বাটন সেট করতে নিচের ফরম্যাটে রিপ্লাই দাও:\n\n`নাম | লিঙ্ক` \n\nযেমন: `Join | https://t.me/example` ")
+    elif callback_query.data == "confirm_bc":
+        await send_the_broadcast(client, callback_query.message, user_id)
+
+# বাটন ডিটেইলস রিসিভ করা
+@app.on_message(filters.private & filters.user(ADMIN_IDS) & filters.regex(r"\|"))
+async def receive_btn_details(client, message):
+    user_id = message.from_user.id
+    if user_id in BROADCAST_DATA:
+        try:
+            parts = message.text.split("|")
+            BROADCAST_DATA[user_id]["btn_name"] = parts[0].strip()
+            BROADCAST_DATA[user_id]["btn_url"] = parts[1].strip()
+            buttons = InlineKeyboardMarkup([[InlineKeyboardButton("🚀 START BROADCAST", callback_data="confirm_bc")]])
+            await message.reply_text(f"✅ বাটন সেভ হয়েছে!\nনাম: {parts[0]}\nএখন শুরু করতে নিচের বাটনে ক্লিক কর।", reply_markup=buttons)
+        except:
+            await message.reply_text("❌ ফরম্যাট ভুল! 'নাম | লিঙ্ক' এভাবে দাও।")
+
+# ব্রডকাস্ট পাঠানোর ফাংশন
+async def send_the_broadcast(client, status_msg, admin_id):
+    data = BROADCAST_DATA.get(admin_id)
+    if not data: return
+    all_users = await user_collection.find().to_list(length=None)
+    
+    btn = None
+    if data["btn_name"] and data["btn_url"]:
+        btn = InlineKeyboardMarkup([[InlineKeyboardButton(data["btn_name"], url=data["btn_url"])]])
+
+    await status_msg.edit_text("⏳ ব্রডকাস্টিং শুরু হয়েছে...")
+    count = 0
+    for user in all_users:
+        try:
+            await data["message"].copy(chat_id=user['user_id'], reply_markup=btn)
+            count += 1
+            await asyncio.sleep(0.05)
+        except: pass
+    await status_msg.edit_text(f"✅ ব্রডকাস্ট সম্পন্ন! {count} জন পেয়েছে।")
+    if admin_id in BROADCAST_DATA: del BROADCAST_DATA[admin_id]
 # ৬. ওভারভিউ কমান্ডস
 @app.on_message(filters.command("overview") & filters.user(ADMIN_IDS))
 async def overview(client, message):
