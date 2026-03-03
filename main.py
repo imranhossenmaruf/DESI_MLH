@@ -3,7 +3,8 @@ import random
 import re
 from datetime import datetime, timedelta
 from pyrogram import Client, filters
-from pyrogram.types import ChatPermissions
+from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton
+import urllib.parse  # এটিও যোগ কর, বাটন লিংকের টেক্সট এনকোড করার জন্য
 from pyrogram.errors import UserIsBlocked, InputUserDeactivated
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import API_ID, API_HASH, BOT_TOKEN, ADMIN_IDS, DATABASE_CHANNEL_ID, MONGO_URL
