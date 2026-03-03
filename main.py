@@ -154,33 +154,17 @@ async def admin_mode_off(client, message):
     )
 
 # ৬. ব্রডকাস্ট উইজার্ড
-@app.on_message(filters.private & filters.user(ADMIN_IDS) & ~filters.command(["start", "admin", "adminexit", "video", "profile", "overview", "overview7days", "broadcast", "broadcastoff"]) & ~filters.regex(r"\|"))
-async def broadcast_wizard(client, message):
-    if message.from_user.id in ADMIN_MODE_USERS:
-        user_id = message.from_user.id
-        BROADCAST_DATA[user_id] = {"message": message, "btn_name": None, "btn_url": None}
-
-        buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔗 SET BUTTON URL", callback_data="set_btn_url")],
-            [InlineKeyboardButton("🚀 SEND NOW (No Button)", callback_data="confirm_bc")]
-        ])
-        await message.reply_text("📝 মেসেজ পাওয়া গেছে! বাটন এড করতে চাস?", reply_markup=buttons)
-
-# বাটন সেট ও ব্রডকাস্ট কনফার্ম করার কলব্যাক
-@app.on_callback_query(filters.regex(r"^(set_btn_url|confirm_bc)$"))
-async def handle_bc_callback(client, callback_query):
-    user_id = callback_query.from_user.id
-    if callback_query.data == "set_btn_url":
-        await callback_query.message.edit_text("⌨️ বাটন সেট করতে নিচের ফরম্যাটে রিপ্লাই দাও:\n\n`নাম | লিঙ্ক` \n\nযেমন: `Join | https://t.me/example` ")
-    elif callback_query.data == "confirm_bc":
-        await send_the_broadcast(client, callback_query.message, user_id)
-# বাটন ডিটেইলস রিসিভ করা (মূল মেসেজ পরিবর্তন না করে শুধু বাটন আপডেট হবে)@app.on_message(filters.private & filters.user(ADMIN_IDS) & filters.regex(r"\|"))
+# বাটন ডিটেইলস রিসিভ করা (মূল মেসেজ পরিবর্তন না করে শুধু বাটন আপডেট হবে)
+@app.on_message(filters.private & filters.user(ADMIN_IDS) & filters.regex(r"\|"))
 async def receive_btn_details(client, message):
     user_id = message.from_user.id
     if user_id in BROADCAST_DATA:
-        parts = message.text.split("|")
-        BROADCAST_DATA[user_id]["btn_name"] = parts[0].strip()
-        BROADCAST_DATA[user_id]["btn_url"] = parts[1].strip()
+        try:
+            parts = message.text.split("|")
+            # এখানে শুধু বাটন ডাটা আপডেট হচ্ছে, মূল মেসেজ আগেরটাই থাকছে
+            BROADCAST_DATA[user_id]["btn_name"] = parts[0].strip()
+            BROADCAST_DATA[user_id]["btn_url"] = parts[1].strip()
+            
             buttons = InlineKeyboardMarkup([[InlineKeyboardButton("🚀 START BROADCAST", callback_data="confirm_bc")]])
             await message.reply_text(
                 f"✅ **বাটন সেভ হয়েছে!**\n"
@@ -191,30 +175,38 @@ async def receive_btn_details(client, message):
                 f"এখন ব্রডকাস্ট শুরু করতে নিচের বাটনে ক্লিক কর।", 
                 reply_markup=buttons
             )
-        except:
-            await message.reply_text("❌ ফরম্যাট ভুল! 'নাম | লিঙ্ক' এভাবে দাও।")
+        except Exception as e:
+            await message.reply_text(f"❌ ফরম্যাট ভুল! 'নাম | লিঙ্ক' এভাবে দাও।\nএরর: {e}")
 
-# ব্রডকাস্ট পাঠানোর ফাংশন
+# ব্রডকাস্ট পাঠানোর মূল ইঞ্জিন
 async def send_the_broadcast(client, status_msg, admin_id):
     data = BROADCAST_DATA.get(admin_id)
-    if not data: return
+    if not data: 
+        return await status_msg.edit_text("❌ ডাটা পাওয়া যায়নি!")
+        
     all_users = await user_collection.find().to_list(length=None)
     
+    # বাটন চেক করা
     btn = None
     if data["btn_name"] and data["btn_url"]:
         btn = InlineKeyboardMarkup([[InlineKeyboardButton(data["btn_name"], url=data["btn_url"])]])
 
-    await status_msg.edit_text("⏳ ব্রডকাস্টিং শুরু হয়েছে...")
+    await status_msg.edit_text(f"⏳ ব্রডকাস্টিং শুরু হয়েছে...\nমোট ইউজার: {len(all_users)}")
+    
     count = 0
     for user in all_users:
         try:
+            # copy() ব্যবহার করলে আসল মেসেজ (মুভি/ছবি) হুবহু যায়
             await data["message"].copy(chat_id=user['user_id'], reply_markup=btn)
             count += 1
-            await asyncio.sleep(0.05)
-        except: pass
-    await status_msg.edit_text(f"✅ ব্রডকাস্ট সম্পন্ন! {count} জন পেয়েছে।")
-    if admin_id in BROADCAST_DATA: del BROADCAST_DATA[admin_id]
-# ৬. ওভারভিউ কমান্ডস
+            await asyncio.sleep(0.05) # Flood wait এড়াতে বিরতি
+        except:
+            pass
+            
+    await status_msg.edit_text(f"✅ **ব্রডকাস্ট সম্পন্ন!**\n━━━━━━━━━━━━━━━━━━━\n📤 পাঠানো হয়েছে: `{count}`\n━━━━━━━━━━━━━━━━━━━")
+    if admin_id in BROADCAST_DATA: 
+        del BROADCAST_DATA[admin_id]
+        # ৬. ওভারভিউ কমান্ডস
 @app.on_message(filters.command("overview") & filters.user(ADMIN_IDS))
 async def overview(client, message):
     total_users = await user_collection.count_documents({})
