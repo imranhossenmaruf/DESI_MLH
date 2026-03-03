@@ -155,7 +155,7 @@ async def admin_mode_off(client, message):
 
 # ৬. ব্রডকাস্ট উইজার্ড
 # ৬. ব্রডকাস্ট উইজার্ড (মেসেজ রিসিভ করা - এটি তোর ফাইলে মিসিং ছিল)
-@app.on_message(filters.private & filters.user(ADMIN_IDS) & ~filters.command(["start", "admin", "adminexit", "video", "profile", "overview", "overview7days", "broadcast", "broadcastoff"]) & ~filters.regex(r"\|"))
+@app.on_message(filters.private & filters.user(ADMIN_IDS) & ~filters.command(["start", "admin", "adminexit", "video", "profile", "overview", "overview7days"]) & ~filters.regex(r"\|"))
 async def broadcast_wizard(client, message):
     if message.from_user.id in ADMIN_MODE_USERS:
         user_id = message.from_user.id
