@@ -209,32 +209,40 @@ async def receive_btn_details(client, message):
             )
         except Exception as e:
             await message.reply_text(f"❌ ফরম্যাট ভুল! 'নাম | লিঙ্ক' এভাবে দাও।")
-
-# ব্রডকাস্ট পাঠানোর মূল ইঞ্জিন
+# ব্রডকাস্ট পাঠানোর মূল ইঞ্জিন (ইউজার + গ্রুপ সবার জন্য)
 async def send_the_broadcast(client, status_msg, admin_id):
     data = BROADCAST_DATA.get(admin_id)
     if not data: 
         return await status_msg.edit_text("❌ ডাটা পাওয়া যায়নি!")
         
-    all_users = await user_collection.find().to_list(length=None)
+    # ডাটাবেস থেকে ইউজার এবং গ্রুপ সবার আইডি তুলে আনা হচ্ছে
+    all_targets = await user_collection.find().to_list(length=None)
     
     btn = None
     if data["btn_name"] and data["btn_url"]:
         btn = InlineKeyboardMarkup([[InlineKeyboardButton(data["btn_name"], url=data["btn_url"])]])
 
-    await status_msg.edit_text(f"⏳ ব্রডকাস্টিং শুরু হয়েছে...\nমোট ইউজার: {len(all_users)}")
+    await status_msg.edit_text(f"⏳ ব্রডকাস্টিং শুরু হয়েছে...\nমোট লক্ষ্য (ইউজার+গ্রুপ): {len(all_targets)}")
     
     count = 0
-    for user in all_users:
+    for target in all_targets:
         try:
-            # copy() ব্যবহার করে আসল মেসেজটি বাটনসহ পাঠানো হচ্ছে
-            await data["message"].copy(chat_id=user['user_id'], reply_markup=btn)
+            # copy() ব্যবহার করে মেসেজ পাঠানো হচ্ছে
+            sent = await data["message"].copy(chat_id=target['user_id'], reply_markup=btn)
+            
+            # যদি এটি গ্রুপ হয় (ID < 0), তবে মেসেজটি পিন করে দেবে
+            if target['user_id'] < 0:
+                try:
+                    await sent.pin(disable_notification=False)
+                except:
+                    pass
+                    
             count += 1
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.05) # Flood wait এড়াতে সামান্য বিরতি
         except:
             pass
             
-    await status_msg.edit_text(f"✅ **ব্রডকাস্ট সম্পন্ন!**\n━━━━━━━━━━━━━━━━━━━\n📤 পাঠানো হয়েছে: `{count}`\n━━━━━━━━━━━━━━━━━━━")
+    await status_msg.edit_text(f"✅ **ব্রডকাস্ট সম্পন্ন!**\n━━━━━━━━━━━━━━━━━━━\n📤 মোট পাঠানো হয়েছে: `{count}`\n━━━━━━━━━━━━━━━━━━━")
     if admin_id in BROADCAST_DATA: 
         del BROADCAST_DATA[admin_id]
 # ৬. ওভারভিউ কমান্ডস
