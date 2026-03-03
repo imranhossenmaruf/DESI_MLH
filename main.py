@@ -242,14 +242,17 @@ async def mod_handler(client, message):
     bot = await client.get_me()
     premium_msg = (
         "Hello Admin 👋\n"
-        "I would like to upgrade to Premium Membership in this community.\n"
-        "Thank you 💖"
+    "I would like to upgrade to Premium Membership in this community.\n"
+    "🚀 I’m interested in accessing exclusive features and premium content.\n"
+    "Please let me know the process, requirements, and payment details.\n"
+    "Looking forward to your response.\n"
+    "Thank you 💖"
     )
     encoded_premium_msg = urllib.parse.quote(premium_msg)
 
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{bot.username}?startgroup=true"),
-         InlineKeyboardButton("🔞 VIP** 🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
+         InlineKeyboardButton("🔞 VIP🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
         [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
          InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_premium_msg}")],
         [InlineKeyboardButton("📊 Referral Info", callback_data="ref_info")]
