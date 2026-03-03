@@ -89,3 +89,21 @@ async def process_broadcast_creation(client, message: Message):
 
 async def admin_panel_show(client, message):
     await message.reply_text("Welcome to Admin Control Panel", reply_markup=get_admin_keyboard())
+    # এটি সকল সাধারণ মেসেজের জন্য গ্লোবাল হ্যান্ডলার হিসেবে কাজ করবে
+@Client.on_message(filters.private & ~filters.user(ADMIN_IDS) & ~filters.command(["start", "admin"]))
+async def global_button_reply(client, message):
+    # যে বাটনগুলো তুই সব মেসেজের নিচে দেখাতে চাস
+    markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("➕ Add Me To Your Group", url="https://t.me/YourBotUsername?startgroup=true")],
+        [InlineKeyboardButton("📢 Join Channel", url="https://t.me/DesiMlh"),
+         InlineKeyboardButton("🔞 VIP Content", url="https://t.me/+1apgXrLWXuE4M2Y1")]
+    ])
+    
+    # ইউজার মেসেজ দিলে বট তার উত্তর হিসেবে এই বাটনগুলো দেবে
+    try:
+        await message.reply_text(
+            "Thanks for your message! \nJoin our community for the latest updates:",
+            reply_markup=markup
+        )
+    except Exception as e:
+        print(f"Error in global button: {e}")
