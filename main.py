@@ -378,7 +378,46 @@ async def save_video(client, message):
     file_id = message.video.file_id if message.video else message.document.file_id
     if not await video_collection.find_one({"file_id": file_id}):
         await video_collection.insert_one({"file_id": file_id, "caption": message.caption or "No Title", "used_by": []})
+# --- জয়েন রিকোয়েস্ট হ্যান্ডলার ও অটো-সেভ লজিক ---
+@app.on_chat_join_request()
+async def auto_approve_and_save_user(client, message):
+    user = message.from_user
+    chat = message.chat
+    
+    # ১. ডেটাবেসে ইউজার সেভ করা (ইউজার সংখ্যা বাড়াতে এটিই আসল কাজ)
+    if not await user_collection.find_one({"user_id": user.id}):
+        await user_collection.insert_one({
+            "user_id": user.id,
+            "type": "private",
+            "is_blocked": False,
+            "join_date": datetime.now(),
+            "refers": 0,
+            "watched_today": 0
+        })
 
+    # ২. জয়েন রিকোয়েস্ট এপ্রুভ করা
+    try:
+        await client.approve_chat_join_request(chat_id=chat.id, user_id=user.id)
+    except Exception as e:
+        print(f"Error Approving: {e}")
+
+    # ৩. তোর কাছে লগ পাঠানো (সঠিক আইডি দিয়েছি)
+    LOG_GROUP_ID = -1003744642897 
+    log_text = (
+        "📢 **Auto Approval Log**\n"
+        "━━━━━━━━━━━━━━━━━━━\n"
+        f"👤 **User:** {user.first_name}\n"
+        f"🆔 **User ID:** `{user.id}`\n"
+        f"👥 **Group:** {chat.title}\n"
+        f"📅 **Time:** {datetime.now().strftime('%I:%M %p')}\n"
+        "━━━━━━━━━━━━━━━━━━━\n"
+        "✅ **Status:** User Saved to Database"
+    )
+
+    try:
+        await client.send_message(chat_id=LOG_GROUP_ID, text=log_text)
+    except:
+        pass
 if __name__ == "__main__":
     print("Bot Started Successfully...")
     from plugins.logs import *
