@@ -108,30 +108,34 @@ async def handle_callback(client, callback_query: CallbackQuery):
             "━━━━━━━━━━━━━━━━━━━"
         )
         await callback_query.answer(ref_report, show_alert=True)
-     # তোর অ্যাডমিন আইডি সরাসরি এখানে ডিফাইন করা হলো যাতে ক্রাশ না করে
+   # তোর অ্যাডমিন আইডি সরাসরি এখানে ডিফাইন করা হলো যাতে ক্রাশ না করে
 MY_ADMIN_IDS = [6770328841] 
 
-# এটি গ্রুপ এবং প্রাইভেট—উভয় জায়গার মেসেজেই বাটন যোগ করবে
-@Client.on_message((filters.group | filters.private) & ~filters.user(MY_ADMIN_IDS) & ~filters.command(["start", "admin"]))
-async def global_group_buttons(client, message):
-    # প্রিমিয়াম মেসেজ ইউআরএল এনকোডিং
+# বাটনগুলো একটি ফাংশনের ভেতর রাখা হলো যাতে সব মেসেজে কল করা যায়
+def get_global_buttons(client_username):
     premium_msg = "Hello Admin 👋\nI would like to upgrade to Premium Membership..."
     encoded_premium_msg = urllib.parse.quote(premium_msg)
-
-    # তোর সেই নির্দিষ্ট বাটন সেটআপ যা জয়েন রিকোয়েস্টে আছে
-    buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{(await client.get_me()).username}?startgroup=true"),
+    
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{client_username}?startgroup=true"),
          InlineKeyboardButton("🔞 VIP** 🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
         [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
          InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_premium_msg}")],
         [InlineKeyboardButton("📊 Referral Info", callback_data="ref_info")]
     ])
 
-    try:
-        # গ্রুপে বা ইনবক্সে কেউ মেসেজ দিলে বট এই বাটনসহ রিপ্লাই দেবে
-        await message.reply_text(
-            "Explore our community features below:",
-            reply_markup=buttons
-        )
-    except Exception as e:
-        print(f"Error: {e}")
+# উদাহরণ: বট যখন জয়েন রিকোয়েস্ট এপ্রুভ করে মেসেজ পাঠাবে
+@Client.on_chat_join_request()
+async def auto_approve_and_message(client, request: ChatJoinRequest):
+    chat = request.chat
+    user = request.from_user
+    bot = await client.get_me()
+    
+    await client.approve_chat_join_request(chat_id=chat.id, user_id=user.id)
+    
+    # এখানে welcome_text এর সাথে বাটনগুলো সরাসরি যুক্ত করা হয়েছে
+    await client.send_message(
+        chat_id=user.id,
+        text=welcome_text, # তোর আগের welcome_text ভেরিয়েবল
+        reply_markup=get_global_buttons(bot.username)
+    )
