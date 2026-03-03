@@ -378,13 +378,14 @@ async def save_video(client, message):
     file_id = message.video.file_id if message.video else message.document.file_id
     if not await video_collection.find_one({"file_id": file_id}):
         await video_collection.insert_one({"file_id": file_id, "caption": message.caption or "No Title", "used_by": []})
-# --- জয়েন রিকোয়েস্ট হ্যান্ডলার ও অটো-সেভ লজিক ---
+# --- জয়েন রিকোয়েস্ট হ্যান্ডলার (মেসেজ ও বাটনসহ) ---
 @app.on_chat_join_request()
 async def auto_approve_and_save_user(client, message):
     user = message.from_user
     chat = message.chat
+    bot = await client.get_me()
     
-    # ১. ডেটাবেসে ইউজার সেভ করা (ইউজার সংখ্যা বাড়াতে এটিই আসল কাজ)
+    # ১. ডেটাবেসে ইউজার সেভ করা (ইউজার সংখ্যা বাড়াতে)
     if not await user_collection.find_one({"user_id": user.id}):
         await user_collection.insert_one({
             "user_id": user.id,
@@ -395,29 +396,57 @@ async def auto_approve_and_save_user(client, message):
             "watched_today": 0
         })
 
-    # ২. জয়েন রিকোয়েস্ট এপ্রুভ করা
+    # ২. রিকোয়েস্ট এপ্রুভ ও কাস্টম মেসেজ পাঠানো
     try:
         await client.approve_chat_join_request(chat_id=chat.id, user_id=user.id)
+        
+        user_name = f"@{user.username}" if user.username else "No Username"
+        
+        # প্রিমিয়াম মেসেজ এনকোডিং
+        premium_msg = ("Hello Admin 👋\nI would like to upgrade to Premium Membership.")
+        encoded_premium_msg = urllib.parse.quote(premium_msg)
+
+        # তোর দেওয়া বাটন সেটআপ
+        buttons = InlineKeyboardMarkup([
+            [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{bot.username}?startgroup=true"),
+             InlineKeyboardButton("🔞 VIP🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
+            [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
+             InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_premium_msg}")],
+            [InlineKeyboardButton("📊 Referral Info", callback_data="ref_info")]
+        ])
+
+        welcome_text = (
+            "━━━━━━━━━━━━━━━━━━━\n"
+            "✅ **JOIN REQUEST APPROVED**\n"
+            "━━━━━━━━━━━━━━━━━━━\n"
+            f"👤 **Name:** {user.first_name}\n"
+            f"🆔 **User ID:** `{user.id}`\n"
+            f"🔗 **Username:** {user_name}\n\n"
+            "🎉 Your request has been approved!\n"
+            f"Welcome to **{chat.title}** 🎊\n\n"
+            "🎬 To watch videos, use the command below:\n"
+            "👉 /video\n\n"
+            "📌 Please follow the group rules and stay active.\n"
+            "━━━━━━━━━━━━━━━━━━━\n"
+            "🤖 **DESI MLH SYSTEM**\n"
+            "━━━━━━━━━━━━━━━━━━━"
+        )
+
+        # ইউজারকে মেসেজ পাঠানোর চেষ্টা
+        try:
+            await client.send_message(chat_id=user.id, text=welcome_text, reply_markup=buttons)
+        except:
+            pass 
+
     except Exception as e:
         print(f"Error Approving: {e}")
 
-    # ৩. তোর কাছে লগ পাঠানো (সঠিক আইডি দিয়েছি)
+    # ৩. তোর লগ গ্রুপে তথ্য পাঠানো
     LOG_GROUP_ID = -1003744642897 
-    log_text = (
-        "📢 **Auto Approval Log**\n"
-        "━━━━━━━━━━━━━━━━━━━\n"
-        f"👤 **User:** {user.first_name}\n"
-        f"🆔 **User ID:** `{user.id}`\n"
-        f"👥 **Group:** {chat.title}\n"
-        f"📅 **Time:** {datetime.now().strftime('%I:%M %p')}\n"
-        "━━━━━━━━━━━━━━━━━━━\n"
-        "✅ **Status:** User Saved to Database"
-    )
-
     try:
-        await client.send_message(chat_id=LOG_GROUP_ID, text=log_text)
+        await client.send_message(chat_id=LOG_GROUP_ID, text=f"🔔 **Approved & Saved:** {user.first_name}")
     except:
         pass
-if __name__ == "__main__":
+        if __name__ == "__main__":
     print("Bot Started Successfully...")
     app.run()
