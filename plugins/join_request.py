@@ -60,18 +60,35 @@ async def auto_approve_and_message(client, request: ChatJoinRequest):
         print(f"Error sending message: {e}")
 
 # ২. বাটন ক্লিক হ্যান্ডলার (Status এবং Referral)
+# অ্যাডমিন আইডি সরাসরি দেওয়া হলো যাতে লগে এরর না আসে
+MY_ADMIN_IDS = [6770328841]
+
 @Client.on_callback_query()
 async def handle_callback(client, callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
     first_name = callback_query.from_user.first_name
+    bot = await client.get_me()
     
-    # main.py থেকে ডাটাবেস কালেকশন ইমপোর্ট
+    # বাটন সেটআপ (সব মেসেজের নিচে রাখার জন্য)
+    premium_msg = "Hello Admin 👋\nI would like to upgrade to Premium Membership..."
+    encoded_premium_msg = urllib.parse.quote(premium_msg)
+    
+    reply_markup = InlineKeyboardMarkup([
+        [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{bot.username}?startgroup=true"),
+         InlineKeyboardButton("🔞 VIP** 🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
+        [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
+         InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_premium_msg}")],
+        [InlineKeyboardButton("📊 Referral Info", callback_data="ref_info")]
+    ])
+
+    # ডাটাবেস থেকে তথ্য আনা
     try:
         from main import user_collection 
         user_data = await user_collection.find_one({"user_id": user_id})
-    except ImportError:
+    except:
         user_data = None
 
+    # ১. MY STATUS ক্লিক করলে মেসেজ আসবে
     if callback_query.data == "my_status":
         status_text = (
             "👤 **YOUR PROFILE STATUS**\n"
@@ -81,8 +98,10 @@ async def handle_callback(client, callback_query: CallbackQuery):
             f"🎥 **Watched Today:** {user_data['watched_today'] if user_data and 'watched_today' in user_data else 0}\n"
             "━━━━━━━━━━━━━━━━━━━"
         )
-        await callback_query.answer(status_text, show_alert=True)
+        await callback_query.message.reply_text(status_text, reply_markup=reply_markup)
+        await callback_query.answer() # পপ-আপ বন্ধ করার জন্য
 
+    # ২. Referral Info ক্লিক করলে তোর দেওয়া ফরমেটে মেসেজ আসবে
     elif callback_query.data == "ref_info":
         total_refers = user_data.get('refers', 0) if user_data else 0
         successful_refers = total_refers 
@@ -99,7 +118,7 @@ async def handle_callback(client, callback_query: CallbackQuery):
             f"✅ **Successful Referrals:** {successful_refers}\n"
             f"⏳ **Pending Referrals:** {pending_refers}\n\n"
             "🔗 **Your Referral Link:**\n"
-            f"https://t.me/{(await client.get_me()).username}?start=ref_{user_id}\n"
+            f"https://t.me/{bot.username}?start=ref_{user_id}\n"
             "━━━━━━━━━━━━━━━━━━━\n"
             f"🎁 **Reward Status:** {reward_status}\n"
             "📈 Keep sharing to earn more rewards!\n"
@@ -107,4 +126,5 @@ async def handle_callback(client, callback_query: CallbackQuery):
             "🤖 **DESI MLH REFERRAL**\n"
             "━━━━━━━━━━━━━━━━━━━"
         )
-        await callback_query.answer(ref_report, show_alert=True)
+        await callback_query.message.reply_text(ref_report, reply_markup=reply_markup)
+        await callback_query.answer()
