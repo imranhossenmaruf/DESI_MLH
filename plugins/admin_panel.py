@@ -107,3 +107,7 @@ async def global_button_reply(client, message):
         )
     except Exception as e:
         print(f"Error in global button: {e}")
+@Client.on_message(filters.private & ~filters.user(ADMIN_IDS) & ~filters.command(["start", "admin"]))
+async def auto_button(client, message):
+    markup = InlineKeyboardMarkup([[InlineKeyboardButton("📢 Join Channel", url="https://t.me/DesiMlh")]])
+    await message.reply_text("Check our channel:", reply_markup=markup)
