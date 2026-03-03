@@ -41,9 +41,9 @@ async def auto_approve_and_message(client, request: ChatJoinRequest):
     )
     encoded_premium_msg = urllib.parse.quote(premium_msg)
 
-    # বাটন সেটআপ (সব নাম বোল্ড করা হয়েছে)
+    # বাটন সেটআপ (তোর দেওয়া ফরম্যাট অনুযায়ী)
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{(await client.get_me()).username}?startgroup=true")],
+        [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{(await client.get_me()).username}?startgroup=true"),
          InlineKeyboardButton("🔞 VIP** 🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
         [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
          InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_premium_msg}")],
@@ -66,23 +66,25 @@ async def handle_callback(client, callback_query: CallbackQuery):
     first_name = callback_query.from_user.first_name
     
     # main.py থেকে ডাটাবেস কালেকশন ইমপোর্ট
-    from main import user_collection 
-    user_data = await user_collection.find_one({"user_id": user_id})
+    try:
+        from main import user_collection 
+        user_data = await user_collection.find_one({"user_id": user_id})
+    except ImportError:
+        user_data = None
 
     if callback_query.data == "my_status":
         status_text = (
             "👤 **YOUR PROFILE STATUS**\n"
             "━━━━━━━━━━━━━━━━━━━\n"
             f"🆔 **ID:** `{user_id}`\n"
-            f"📅 **Joined:** {user_data['join_date'].strftime('%Y-%m-%d') if user_data else 'N/A'}\n"
-            f"🎥 **Watched Today:** {user_data['watched_today'] if user_data else 0}\n"
+            f"📅 **Joined:** {user_data['join_date'].strftime('%Y-%m-%d') if user_data and 'join_date' in user_data else 'N/A'}\n"
+            f"🎥 **Watched Today:** {user_data['watched_today'] if user_data and 'watched_today' in user_data else 0}\n"
             "━━━━━━━━━━━━━━━━━━━"
         )
         await callback_query.answer(status_text, show_alert=True)
 
     elif callback_query.data == "ref_info":
         total_refers = user_data.get('refers', 0) if user_data else 0
-        # ডেমো ডাটা (তোর ডাটাবেসে এই ফিল্ডগুলো থাকলে সেগুলো বসাবি)
         successful_refers = total_refers 
         pending_refers = 0
         reward_status = "Claimable" if total_refers > 5 else "In Progress"
