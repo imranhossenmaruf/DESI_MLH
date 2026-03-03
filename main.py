@@ -40,7 +40,17 @@ async def save_user(client, message):
             "watched_today": 0
         })
     message.continue_propagation()
-
+# গ্রুপ ডাটা সেভ করার লজিক
+@app.on_message(filters.group & ~filters.service)
+async def save_group(client, message):
+    chat_id = message.chat.id
+    if not await user_collection.find_one({"user_id": chat_id}):
+        await user_collection.insert_one({
+            "user_id": chat_id,
+            "type": "group",
+            "join_date": datetime.now()
+        })
+    message.continue_propagation()
 # ২. স্টার্ট কমান্ড (আপনার দেওয়া ওয়েলকাম ফরম্যাটে)
 @app.on_message(filters.command("start"))
 async def start(client, message):
