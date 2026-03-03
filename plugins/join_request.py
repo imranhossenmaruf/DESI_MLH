@@ -108,34 +108,3 @@ async def handle_callback(client, callback_query: CallbackQuery):
             "━━━━━━━━━━━━━━━━━━━"
         )
         await callback_query.answer(ref_report, show_alert=True)
-   # তোর অ্যাডমিন আইডি সরাসরি এখানে ডিফাইন করা হলো যাতে ক্রাশ না করে
-MY_ADMIN_IDS = [6770328841] 
-
-# বাটনগুলো একটি ফাংশনের ভেতর রাখা হলো যাতে সব মেসেজে কল করা যায়
-def get_global_buttons(client_username):
-    premium_msg = "Hello Admin 👋\nI would like to upgrade to Premium Membership..."
-    encoded_premium_msg = urllib.parse.quote(premium_msg)
-    
-    return InlineKeyboardMarkup([
-        [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{client_username}?startgroup=true"),
-         InlineKeyboardButton("🔞 VIP** 🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
-        [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
-         InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_premium_msg}")],
-        [InlineKeyboardButton("📊 Referral Info", callback_data="ref_info")]
-    ])
-
-# উদাহরণ: বট যখন জয়েন রিকোয়েস্ট এপ্রুভ করে মেসেজ পাঠাবে
-@Client.on_chat_join_request()
-async def auto_approve_and_message(client, request: ChatJoinRequest):
-    chat = request.chat
-    user = request.from_user
-    bot = await client.get_me()
-    
-    await client.approve_chat_join_request(chat_id=chat.id, user_id=user.id)
-    
-    # এখানে welcome_text এর সাথে বাটনগুলো সরাসরি যুক্ত করা হয়েছে
-    await client.send_message(
-        chat_id=user.id,
-        text=welcome_text, # তোর আগের welcome_text ভেরিয়েবল
-        reply_markup=get_global_buttons(bot.username)
-    )
