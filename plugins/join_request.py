@@ -76,7 +76,7 @@ async def handle_callback(client, callback_query: CallbackQuery):
     
     reply_markup = InlineKeyboardMarkup([
         [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{bot.username}?startgroup=true"),
-         InlineKeyboardButton("🔞 VIP** 🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
+         InlineKeyboardButton("🔞 VIP🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
         [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
          InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_premium_msg}")],
         [InlineKeyboardButton("📊 Referral Info", callback_data="ref_info")]
