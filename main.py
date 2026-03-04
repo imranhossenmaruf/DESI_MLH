@@ -442,11 +442,13 @@ async def auto_approve_and_save_user(client, message):
         print(f"Error Approving: {e}")
 
 # ৩. তোর নতুন ফরম্যাটে লগ গ্রুপে তথ্য পাঠানো
-    LOG_GROUP_ID = "-1003744642897" 
     try:
-        # বর্তমান সময় বের করা (বাংলাদেশ সময় অনুযায়ী +৬ ঘণ্টা যোগ করতে পারিস)
+        # আইডিটি সরাসরি ইন্টিজার হিসেবে দিবি
+        LOG_GROUP_ID = -1003744642897 
+        
+        # বর্তমান সময় বের করা
         now = datetime.now()
-        current_time = now.strftime("%I:%M %p") # উদাহরণ: 09:22 PM
+        current_time = now.strftime("%I:%M %p")
 
         log_message = (
             "📢 **Auto Approval Log**\n"
@@ -460,7 +462,7 @@ async def auto_approve_and_save_user(client, message):
         )
         
         await client.send_message(chat_id=LOG_GROUP_ID, text=log_message)
-        print("Log message sent with new format!")
+        print("Log message sent successfully!")
         
     except Exception as log_error:
         print(f"Log Error: {log_error}")
