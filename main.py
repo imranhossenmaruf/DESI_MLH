@@ -442,7 +442,7 @@ async def auto_approve_and_save_user(client, message):
         print(f"Error Approving: {e}")
 
 # ৩. তোর নতুন ফরম্যাটে লগ গ্রুপে তথ্য পাঠানো
-    LOG_GROUP_ID = -1003744642897 
+    LOG_GROUP_ID = "-1003744642897" 
     try:
         # বর্তমান সময় বের করা (বাংলাদেশ সময় অনুযায়ী +৬ ঘণ্টা যোগ করতে পারিস)
         now = datetime.now()
