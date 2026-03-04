@@ -442,7 +442,7 @@ async def auto_approve_and_save_user(client, message):
         print(f"Error Approving: {e}")
 
 # ৩. তোর লগ গ্রুপে তথ্য পাঠানো
-    LOG_GROUP_ID = -1003744642897 
+    LOG_GROUP_ID = -1001234567890   
     try:
         await client.send_message(chat_id=LOG_GROUP_ID, text=f"🔔 **Approved & Saved:** {user.first_name}")
     except Exception as log_error:
