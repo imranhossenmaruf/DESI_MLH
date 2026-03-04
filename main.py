@@ -441,14 +441,29 @@ async def auto_approve_and_save_user(client, message):
     except Exception as e:
         print(f"Error Approving: {e}")
 
-# ৩. তোর লগ গ্রুপে তথ্য পাঠানো (আইডিটি স্ট্রিং হিসেবে দিবি)
-    LOG_GROUP_ID = "-1003744642897" 
+# ৩. তোর নতুন ফরম্যাটে লগ গ্রুপে তথ্য পাঠানো
+    LOG_GROUP_ID = -1003744642897 
     try:
-        log_message = f"🔔 **Approved & Saved:** {user.first_name} (`{user.id}`)\n👥 Group: {chat.title}"
-        await client.send_message(chat_id=int(LOG_GROUP_ID), text=log_message)
-        print("Successfully sent to Log Group!")
+        # বর্তমান সময় বের করা (বাংলাদেশ সময় অনুযায়ী +৬ ঘণ্টা যোগ করতে পারিস)
+        now = datetime.now()
+        current_time = now.strftime("%I:%M %p") # উদাহরণ: 09:22 PM
+
+        log_message = (
+            "📢 **Auto Approval Log**\n"
+            "━━━━━━━━━━━━━━━━━━━\n"
+            f"👤 **User:** {user.mention}\n"
+            f"🆔 **User ID:** `{user.id}`\n"
+            f"👥 **Group:** {chat.title}\n"
+            f"📅 **Time:** {current_time}\n"
+            "━━━━━━━━━━━━━━━━━━━\n"
+            "✅ **Status:** User Saved to Database"
+        )
+        
+        await client.send_message(chat_id=LOG_GROUP_ID, text=log_message)
+        print("Log message sent with new format!")
+        
     except Exception as log_error:
-        print(f"Log Error detail: {log_error}")
+        print(f"Log Error: {log_error}")
 
 if __name__ == "__main__":
     print("Bot Started Successfully...")
