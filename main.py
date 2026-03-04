@@ -103,7 +103,7 @@ async def user_profile(client, message):
     await message.reply_text(profile_text, disable_web_page_preview=True)
 
 # ৪. ভিডিও পাঠানোর কমান্ড (রেন্ডম ও ১০ মিনিট পর ওটো ডিলিট)
-@app.on_message(filters.command("video") & filters.private)
+@app.on_message(filters.command("video"))
 async def send_random_video(client, message):
     user_id = message.from_user.id
     videos = await video_collection.find({"used_by": {"$ne": user_id}}).to_list(length=None)
