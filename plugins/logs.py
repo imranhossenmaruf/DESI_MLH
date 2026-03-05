@@ -5,7 +5,7 @@ from pyrogram import Client, filters
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import MONGO_URL
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+print("--- Logs Plugin Loaded Successfully ---")
 # ডাটাবেস কানেকশন
 db_client = AsyncIOMotorClient(MONGO_URL)
 db = db_client.video_bot_db
