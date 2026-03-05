@@ -1,8 +1,9 @@
-import urllib.parse
+import urllib.parse  # 'I' ছোট হাতের হবে
+import asyncio
 from datetime import datetime
 from pyrogram import Client, filters
 from motor.motor_asyncio import AsyncIOMotorClient
-from config import MONGO_URL, ADMIN_IDS
+from config import MONGO_URL
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # ডাটাবেস কানেকশন
@@ -32,12 +33,12 @@ async def auto_approve_and_log(client, message):
     try:
         await client.approve_chat_join_request(chat_id=chat.id, user_id=user.id)
         
-        bot = await client.get_me()
+        bot_info = await client.get_me()
         premium_msg = "Hello Admin 👋\nI would like to upgrade to Premium Membership."
         encoded_msg = urllib.parse.quote(premium_msg)
 
         buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{bot.username}?startgroup=true"),
+            [InlineKeyboardButton("➕ ADD ME TO GROUP", url=f"https://t.me/{bot_info.username}?startgroup=true"),
              InlineKeyboardButton("🔞 VIP🫦", url="https://t.me/+1apgXrLWXuE4M2Y1")],
             [InlineKeyboardButton("👤 MY STATUS", callback_data="my_status"), 
              InlineKeyboardButton("💎 BUY PREMIUM", url=f"https://t.me/IH_Maruf?text={encoded_msg}")],
