@@ -8,7 +8,7 @@ import urllib.parse  # এটিও যোগ কর, বাটন লিংক�
 from pyrogram.errors import UserIsBlocked, InputUserDeactivated
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import API_ID, API_HASH, BOT_TOKEN, ADMIN_IDS, DATABASE_CHANNEL_ID, MONGO_URL
-print("--- Logs Plugin Loaded Successfully ---")
+
 # ডাটাবেস কানেকশন
 db_client = AsyncIOMotorClient(MONGO_URL)
 db = db_client.video_bot_db
