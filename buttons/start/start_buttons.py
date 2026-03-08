@@ -24,7 +24,7 @@ start_buttons = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(
                 "💰 BUY PREMIUM",
-                url="https://t.me/YOUR_USERNAME?text=I%20want%20to%20buy%20premium%20access%20of%20your%20bot"
+                url="https://t.me/IH_Maruf?text=I%20want%20to%20buy%20premium%20access%20of%20your%20bot"
             )
         ],
         [
