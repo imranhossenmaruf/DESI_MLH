@@ -1,0 +1,11 @@
+def broadcast_usage():
+
+    return """
+<b>📢 BROADCAST SYSTEM</b>
+
+<b>Usage :</b>
+
+<code>/broadcast your_message</code>
+
+<b>This message will be sent to all users.</b>
+"""
