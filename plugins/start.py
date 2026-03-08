@@ -11,5 +11,6 @@ async def start_command(client, message):
 
     await message.reply(
         text,
-        reply_markup=buttons
+        reply_markup=buttons,
+        parse_mode="html"
     )
