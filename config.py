@@ -11,3 +11,4 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_IDS = [int(i) for i in os.getenv("ADMIN_IDS", "").split(",") if i]
 DATABASE_CHANNEL_ID = int(os.getenv("DATABASE_CHANNEL_ID", "0"))
 MONGO_URL = os.getenv("MONGO_URL")
+BOT_USERNAME = "@DesiMlh_bot"
