@@ -12,7 +12,7 @@ start_buttons = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(
                 "💎 VIP",
-                url="https://t.me/YOUR_CHANNEL_LINK"
+                url="https://t.me/+1apgXrLWXuE4M2Y1"
             )
         ],
         [
